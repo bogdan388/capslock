@@ -105,18 +105,34 @@ capslock/
 │   ├── development.config.ts
 │   ├── staging.config.ts
 │   └── production.config.ts
+├── locators/               # Locator definitions (separated from pages)
+│   ├── lead-form.locators.ts
+│   └── thank-you.locators.ts
+├── pages/                  # Page Object Models (actions + assertions)
+│   ├── LeadFormPage.ts
+│   └── ThankYouPage.ts
 ├── tests/                  # Test specifications
 │   ├── lead-form.spec.ts   # Main form tests (data-driven)
 │   ├── navigation.spec.ts  # Browser navigation tests
 │   └── performance.spec.ts
-├── pages/                  # Page Object Models
-│   ├── LeadFormPage.ts
-│   └── ThankYouPage.ts
 ├── test-data/              # Test data constants
 │   └── form-data.ts
 ├── playwright.config.ts    # Playwright configuration
 └── package.json
 ```
+
+### Architecture Pattern
+
+The project follows a strict separation of concerns:
+
+- **Locators** (`locators/`): Pure locator definitions, no actions or assertions
+- **Pages** (`pages/`): Action methods (fill, click, submit) and assertion methods (expectVisible, expectValue)
+- **Tests** (`tests/`): Only call page methods, no direct locator access or `expect()` calls
+
+This pattern ensures:
+- Tests are readable and business-focused
+- Locators are centralized and easy to maintain
+- Assertions are encapsulated and reusable
 
 ---
 

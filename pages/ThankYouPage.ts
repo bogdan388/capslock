@@ -1,18 +1,21 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
+import { ThankYouLocators } from '../locators/thank-you.locators';
 
 export class ThankYouPage {
   readonly page: Page;
-  readonly heading: Locator;
-  readonly confirmationMessage: Locator;
+  private readonly locators: ThankYouLocators;
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: 'Thank you!' });
-    this.confirmationMessage = page.getByText('We will be calling within the next 10 minutes');
+    this.locators = new ThankYouLocators(page);
   }
 
-  async verifyOnThankYouPage() {
+  async expectOnThankYouPage() {
     await expect(this.page).toHaveURL(/.*\/thankyou/);
-    await expect(this.heading).toBeVisible();
+    await expect(this.locators.heading).toBeVisible();
+  }
+
+  async expectConfirmationMessageVisible() {
+    await expect(this.locators.confirmationMessage).toBeVisible();
   }
 }

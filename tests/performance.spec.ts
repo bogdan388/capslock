@@ -26,6 +26,14 @@ function warnIfExceeds(
   }
 }
 
+function expectPositiveNumber(value: number) {
+  expect(value).toBeGreaterThan(0);
+}
+
+function expectDefined(value: unknown) {
+  expect(value).toBeDefined();
+}
+
 test.describe('Lead Form - Performance @performance', () => {
   test('page should load within acceptable time', async ({ page }, testInfo) => {
     const startTime = Date.now();
@@ -35,7 +43,7 @@ test.describe('Lead Form - Performance @performance', () => {
     const loadTime = Date.now() - startTime;
 
     warnIfExceeds(testInfo, 'Page Load Time', loadTime, THRESHOLDS.pageLoad);
-    expect(loadTime).toBeGreaterThan(0);
+    expectPositiveNumber(loadTime);
   });
 
   test('form container should be visible within 3 seconds', async ({ page }) => {
@@ -43,7 +51,7 @@ test.describe('Lead Form - Performance @performance', () => {
 
     await page.goto('/');
 
-    await expect(leadForm.formContainer).toBeVisible({ timeout: 3000 });
+    await leadForm.expectFormContainerVisibleWithTimeout(3000);
   });
 
   test('step transition should be responsive', async ({ page }, testInfo) => {
@@ -54,11 +62,11 @@ test.describe('Lead Form - Performance @performance', () => {
 
     const startTime = Date.now();
     await leadForm.submitZipCode();
-    await expect(leadForm.safetyOption).toBeVisible();
+    await leadForm.expectInterestOptionsVisible();
     const transitionTime = Date.now() - startTime;
 
     warnIfExceeds(testInfo, 'Step Transition Time', transitionTime, THRESHOLDS.stepTransition);
-    expect(transitionTime).toBeGreaterThan(0);
+    expectPositiveNumber(transitionTime);
   });
 
   test('should measure form completion time', async ({ page }, testInfo) => {
@@ -76,12 +84,12 @@ test.describe('Lead Form - Performance @performance', () => {
     await leadForm.fillName(validFormData.name);
     await leadForm.fillEmail(validFormData.email);
     await leadForm.submitNameAndEmail();
-    await expect(leadForm.phoneInput).toBeVisible();
+    await leadForm.expectPhoneInputVisible();
 
     const completionTime = Date.now() - startTime;
 
     warnIfExceeds(testInfo, 'Form Completion Time', completionTime, THRESHOLDS.formCompletion);
-    expect(completionTime).toBeGreaterThan(0);
+    expectPositiveNumber(completionTime);
   });
 
   test('should collect Web Vitals metrics', async ({ page }) => {
@@ -125,7 +133,7 @@ test.describe('Lead Form - Performance @performance', () => {
 
     console.log('Performance Metrics:', metrics);
 
-    expect(metrics).toBeDefined();
+    expectDefined(metrics);
   });
 
   test('should handle rapid form interactions', async ({ page }) => {
@@ -134,13 +142,13 @@ test.describe('Lead Form - Performance @performance', () => {
     await leadForm.goto();
 
     for (let i = 0; i < 5; i++) {
-      await leadForm.zipCodeInput.fill('');
+      await leadForm.clearZipCode();
       await leadForm.fillZipCode(validFormData.zipCode);
     }
 
     await leadForm.submitZipCode();
 
-    await expect(leadForm.safetyOption).toBeVisible();
+    await leadForm.expectInterestOptionsVisible();
   });
 
   test('should not have memory leaks during navigation', async ({ page }, testInfo) => {
@@ -157,7 +165,7 @@ test.describe('Lead Form - Performance @performance', () => {
       await leadForm.goto();
       await leadForm.fillZipCode(validFormData.zipCode);
       await leadForm.submitZipCode();
-      await expect(leadForm.safetyOption).toBeVisible();
+      await leadForm.expectInterestOptionsVisible();
     }
 
     const finalMemory = await page.evaluate(() => {
@@ -192,6 +200,6 @@ test.describe('Lead Form - Performance @performance', () => {
 
     console.log(`Total network requests: ${requestCount}`);
 
-    expect(requestCount).toBeGreaterThan(0);
+    expectPositiveNumber(requestCount);
   });
 });

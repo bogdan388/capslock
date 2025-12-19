@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { LeadFormPage } from '../pages/LeadFormPage';
 import { ThankYouPage } from '../pages/ThankYouPage';
 import {
@@ -19,25 +19,25 @@ test.describe('Lead Form - Happy Path @smoke @critical', () => {
     await leadForm.fillZipCode(validFormData.zipCode);
     await leadForm.submitZipCode();
 
-    await expect(leadForm.safetyOption).toBeVisible();
+    await leadForm.expectInterestOptionsVisible();
     await leadForm.selectInterest('Safety');
     await leadForm.submitInterest();
 
-    await expect(leadForm.ownedHouseOption).toBeVisible();
+    await leadForm.expectPropertyOptionsVisible();
     await leadForm.selectPropertyType('Owned House / Condo');
     await leadForm.submitPropertyType();
 
-    await expect(leadForm.nameInput).toBeVisible();
+    await leadForm.expectNameInputVisible();
     await leadForm.fillName(validFormData.name);
     await leadForm.fillEmail(validFormData.email);
     await leadForm.submitNameAndEmail();
 
-    await expect(leadForm.phoneInput).toBeVisible();
+    await leadForm.expectPhoneInputVisible();
     await leadForm.fillPhone(validFormData.phone);
     await leadForm.submitPhone();
 
-    await thankYouPage.verifyOnThankYouPage();
-    await expect(thankYouPage.confirmationMessage).toBeVisible();
+    await thankYouPage.expectOnThankYouPage();
+    await thankYouPage.expectConfirmationMessageVisible();
   });
 });
 
@@ -59,8 +59,8 @@ test.describe('Lead Form - ZIP Code Validation @regression', () => {
       }
       await leadForm.submitZipCode();
 
-      await expect(leadForm.zipCodeInput).toBeVisible();
-      await expect(leadForm.safetyOption).not.toBeVisible();
+      await leadForm.expectZipCodeInputVisible();
+      await leadForm.expectInterestOptionsNotVisible();
     });
   }
 });
@@ -85,7 +85,7 @@ test.describe('Lead Form - Email Validation @regression', () => {
         email: testCase.value,
       });
 
-      await expect(leadForm.phoneInput).not.toBeVisible();
+      await leadForm.expectPhoneInputNotVisible();
     });
   }
 
@@ -104,7 +104,7 @@ test.describe('Lead Form - Email Validation @regression', () => {
     await leadForm.fillName(validFormData.name);
     await leadForm.submitNameAndEmail();
 
-    await expect(leadForm.phoneInput).not.toBeVisible();
+    await leadForm.expectPhoneInputNotVisible();
   });
 });
 
@@ -130,8 +130,8 @@ test.describe('Lead Form - Phone Validation @regression', () => {
       await leadForm.fillPhone(testCase.value);
       await leadForm.submitPhone();
 
-      await expect(leadForm.phoneErrorMessage).toBeVisible();
-      await expect(page).not.toHaveURL(/.*\/thankyou/);
+      await leadForm.expectPhoneErrorVisible();
+      await leadForm.expectNotOnThankYouPage();
     });
   }
 
@@ -149,7 +149,7 @@ test.describe('Lead Form - Phone Validation @regression', () => {
 
     await leadForm.submitPhone();
 
-    await expect(page).not.toHaveURL(/.*\/thankyou/);
+    await leadForm.expectNotOnThankYouPage();
   });
 });
 
@@ -161,8 +161,8 @@ test.describe('Lead Form - Out of Area Flow @smoke', () => {
     await leadForm.fillZipCode(outOfAreaZipCode);
     await leadForm.submitZipCode();
 
-    await expect(leadForm.outOfAreaMessage).toBeVisible();
-    await expect(leadForm.outOfAreaEmailInput).toBeVisible();
+    await leadForm.expectOutOfAreaMessageVisible();
+    await leadForm.expectOutOfAreaEmailInputVisible();
   });
 
   test('should allow email signup for out of area users', async ({ page }) => {
@@ -172,10 +172,10 @@ test.describe('Lead Form - Out of Area Flow @smoke', () => {
     await leadForm.fillZipCode(outOfAreaZipCode);
     await leadForm.submitZipCode();
 
-    await expect(leadForm.outOfAreaEmailInput).toBeVisible();
+    await leadForm.expectOutOfAreaEmailInputVisible();
     await leadForm.fillOutOfAreaEmail(validFormData.email);
 
-    await expect(leadForm.outOfAreaEmailInput).toHaveValue(validFormData.email);
+    await leadForm.expectOutOfAreaEmailValue(validFormData.email);
   });
 });
 
@@ -195,7 +195,7 @@ test.describe('Lead Form - Required Fields @regression', () => {
     await leadForm.fillEmail(validFormData.email);
     await leadForm.submitNameAndEmail();
 
-    await expect(leadForm.phoneInput).not.toBeVisible();
+    await leadForm.expectPhoneInputNotVisible();
   });
 });
 
@@ -209,7 +209,7 @@ test.describe('Lead Form - Multi-step Navigation @regression', () => {
     await leadForm.submitZipCode();
 
     const step2Text = await leadForm.getCurrentStep();
-    expect(step2Text).toContain('2 of 5');
+    leadForm.expectStepContains(step2Text, '2 of 5');
 
     await leadForm.selectInterest('Safety');
     await leadForm.submitInterest();
@@ -218,14 +218,14 @@ test.describe('Lead Form - Multi-step Navigation @regression', () => {
     await leadForm.submitPropertyType();
 
     const step4Text = await leadForm.getCurrentStep();
-    expect(step4Text).toContain('4 of 5');
+    leadForm.expectStepContains(step4Text, '4 of 5');
 
     await leadForm.fillName(validFormData.name);
     await leadForm.fillEmail(validFormData.email);
     await leadForm.submitNameAndEmail();
 
     const step5Text = await leadForm.getCurrentStep();
-    expect(step5Text).toContain('5 of 5');
+    leadForm.expectStepContains(step5Text, '5 of 5');
   });
 
   test('should allow selecting multiple interests in step 2', async ({ page }) => {
@@ -241,6 +241,6 @@ test.describe('Lead Form - Multi-step Navigation @regression', () => {
 
     await leadForm.submitInterest();
 
-    await expect(leadForm.ownedHouseOption).toBeVisible();
+    await leadForm.expectPropertyOptionsVisible();
   });
 });

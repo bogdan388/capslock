@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { LeadFormPage } from '../pages/LeadFormPage';
 import { validFormData } from '../test-data/form-data';
 
@@ -10,13 +10,13 @@ test.describe('Lead Form - Navigation @regression', () => {
     await leadForm.fillZipCode(validFormData.zipCode);
     await leadForm.submitZipCode();
 
-    await expect(leadForm.safetyOption).toBeVisible();
+    await leadForm.expectInterestOptionsVisible();
 
     await page.goBack();
     await page.goForward();
 
     await leadForm.goto();
-    await expect(leadForm.formContainer).toBeVisible();
+    await leadForm.expectFormContainerVisible();
   });
 
   test('should allow restarting form after navigation', async ({ page }) => {
@@ -28,11 +28,11 @@ test.describe('Lead Form - Navigation @regression', () => {
     await leadForm.selectInterest('Safety');
     await leadForm.submitInterest();
 
-    await expect(leadForm.ownedHouseOption).toBeVisible();
+    await leadForm.expectPropertyOptionsVisible();
 
     await leadForm.goto();
 
-    await expect(leadForm.formContainer).toBeVisible();
+    await leadForm.expectFormContainerVisible();
   });
 
   test('should handle browser forward button', async ({ page }) => {
@@ -42,12 +42,12 @@ test.describe('Lead Form - Navigation @regression', () => {
     await leadForm.fillZipCode(validFormData.zipCode);
     await leadForm.submitZipCode();
 
-    await expect(leadForm.safetyOption).toBeVisible();
+    await leadForm.expectInterestOptionsVisible();
 
     await page.goBack();
     await page.goForward();
 
-    await expect(leadForm.formContainer).toBeVisible();
+    await leadForm.expectFormContainerVisible();
   });
 
   test('should handle page refresh on step 2', async ({ page }) => {
@@ -57,11 +57,11 @@ test.describe('Lead Form - Navigation @regression', () => {
     await leadForm.fillZipCode(validFormData.zipCode);
     await leadForm.submitZipCode();
 
-    await expect(leadForm.safetyOption).toBeVisible();
+    await leadForm.expectInterestOptionsVisible();
 
     await page.reload();
 
-    await expect(leadForm.formContainer).toBeVisible();
+    await leadForm.expectFormContainerVisible();
   });
 
   test('should handle page refresh on step 4', async ({ page }) => {
@@ -75,11 +75,11 @@ test.describe('Lead Form - Navigation @regression', () => {
     await leadForm.selectPropertyType('Owned House / Condo');
     await leadForm.submitPropertyType();
 
-    await expect(leadForm.nameInput).toBeVisible();
+    await leadForm.expectNameInputVisible();
 
     await page.reload();
 
-    await expect(leadForm.formContainer).toBeVisible();
+    await leadForm.expectFormContainerVisible();
   });
 
   test('should preserve form data after refresh if supported', async ({ page }) => {
@@ -98,7 +98,7 @@ test.describe('Lead Form - Navigation @regression', () => {
 
     await page.reload();
 
-    await expect(leadForm.formContainer).toBeVisible();
+    await leadForm.expectFormContainerVisible();
   });
 
   test('should handle form restart after navigation away', async ({ page }) => {
@@ -108,11 +108,11 @@ test.describe('Lead Form - Navigation @regression', () => {
     await leadForm.fillZipCode(validFormData.zipCode);
     await leadForm.submitZipCode();
 
-    await expect(leadForm.safetyOption).toBeVisible();
+    await leadForm.expectInterestOptionsVisible();
 
     await page.goto('about:blank');
     await leadForm.goto();
 
-    await expect(leadForm.formContainer).toBeVisible();
+    await leadForm.expectFormContainerVisible();
   });
 });

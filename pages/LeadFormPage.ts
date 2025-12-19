@@ -1,148 +1,91 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
+import { LeadFormLocators } from '../locators/lead-form.locators';
 
 export class LeadFormPage {
   readonly page: Page;
-  readonly formContainer: Locator;
-
-  readonly zipCodeInput: Locator;
-  readonly zipNextButton: Locator;
-  readonly zipErrorMessage: Locator;
-
-  readonly independenceOption: Locator;
-  readonly safetyOption: Locator;
-  readonly therapyOption: Locator;
-  readonly otherOption: Locator;
-  readonly interestNextButton: Locator;
-
-  readonly ownedHouseOption: Locator;
-  readonly rentalPropertyOption: Locator;
-  readonly mobileHomeOption: Locator;
-  readonly propertyNextButton: Locator;
-
-  readonly nameInput: Locator;
-  readonly emailInput: Locator;
-  readonly goToEstimateButton: Locator;
-  readonly nameErrorMessage: Locator;
-  readonly emailErrorMessage: Locator;
-
-  readonly phoneInput: Locator;
-  readonly submitButton: Locator;
-  readonly phoneErrorMessage: Locator;
-
-  readonly outOfAreaMessage: Locator;
-  readonly outOfAreaEmailInput: Locator;
-  readonly outOfAreaSubmitButton: Locator;
-
-  readonly stepIndicator: Locator;
+  private readonly locators: LeadFormLocators;
 
   constructor(page: Page) {
     this.page = page;
-    this.formContainer = page.locator('#form-container-1');
-
-    this.zipCodeInput = this.formContainer.getByRole('textbox', { name: 'Enter ZIP Code' });
-    this.zipNextButton = this.formContainer.getByRole('button', { name: 'Next ' });
-    this.zipErrorMessage = this.formContainer.locator('text=Wrong zip');
-
-    this.independenceOption = this.formContainer.getByText('Independence');
-    this.safetyOption = this.formContainer.getByText('Safety');
-    this.therapyOption = this.formContainer.getByText('Therapy');
-    this.otherOption = this.formContainer.locator('[class*="checkbox"]').filter({ hasText: 'Other' });
-    this.interestNextButton = this.formContainer.getByRole('button', { name: 'Next ' });
-
-    this.ownedHouseOption = this.formContainer.getByText('Owned House / Condo');
-    this.rentalPropertyOption = this.formContainer.getByText('Rental Property');
-    this.mobileHomeOption = this.formContainer.getByText('Mobile Home');
-    this.propertyNextButton = this.formContainer.getByRole('button', { name: 'Next ' });
-
-    this.nameInput = this.formContainer.getByRole('textbox', { name: 'Enter Your Name' });
-    this.emailInput = this.formContainer.getByRole('textbox', { name: 'Enter Your Email' });
-    this.goToEstimateButton = this.formContainer.getByRole('button', { name: 'Go To Estimate' });
-    this.nameErrorMessage = this.formContainer.locator('text=Wrong name');
-    this.emailErrorMessage = this.formContainer.locator('text=Wrong email');
-
-    this.phoneInput = this.formContainer.getByRole('textbox', { name: '(XXX)XXX-XXXX' });
-    this.submitButton = this.formContainer.getByRole('button', { name: 'Submit Your Request' });
-    this.phoneErrorMessage = this.formContainer.locator('text=Wrong phone number');
-
-    this.outOfAreaMessage = this.formContainer.getByText(/Sorry, unfortunately we don.t yet install in your area/);
-    this.outOfAreaEmailInput = this.formContainer.getByRole('textbox', { name: 'Email Address' });
-    this.outOfAreaSubmitButton = this.formContainer.getByRole('button', { name: 'Submit' });
-
-    this.stepIndicator = this.formContainer.locator('text=/\\d+ of \\d+/');
+    this.locators = new LeadFormLocators(page);
   }
 
   async goto() {
     await this.page.goto('/');
-    await this.formContainer.scrollIntoViewIfNeeded();
+    await this.locators.formContainer.scrollIntoViewIfNeeded();
   }
 
   async fillZipCode(zipCode: string) {
-    await this.zipCodeInput.fill(zipCode);
+    await this.locators.zipCodeInput.fill(zipCode);
+  }
+
+  async clearZipCode() {
+    await this.locators.zipCodeInput.fill('');
   }
 
   async submitZipCode() {
-    await this.zipNextButton.click();
+    await this.locators.zipNextButton.click();
   }
 
   async selectInterest(interest: 'Independence' | 'Safety' | 'Therapy' | 'Other') {
     const optionMap = {
-      Independence: this.independenceOption,
-      Safety: this.safetyOption,
-      Therapy: this.therapyOption,
-      Other: this.otherOption,
+      Independence: this.locators.independenceOption,
+      Safety: this.locators.safetyOption,
+      Therapy: this.locators.therapyOption,
+      Other: this.locators.otherOption,
     };
     await optionMap[interest].click();
   }
 
   async submitInterest() {
-    await this.interestNextButton.click();
+    await this.locators.interestNextButton.click();
   }
 
   async selectPropertyType(type: 'Owned House / Condo' | 'Rental Property' | 'Mobile Home') {
     const optionMap = {
-      'Owned House / Condo': this.ownedHouseOption,
-      'Rental Property': this.rentalPropertyOption,
-      'Mobile Home': this.mobileHomeOption,
+      'Owned House / Condo': this.locators.ownedHouseOption,
+      'Rental Property': this.locators.rentalPropertyOption,
+      'Mobile Home': this.locators.mobileHomeOption,
     };
     await optionMap[type].click();
   }
 
   async submitPropertyType() {
-    await this.propertyNextButton.click();
+    await this.locators.propertyNextButton.click();
   }
 
   async fillName(name: string) {
-    await this.nameInput.fill(name);
+    await this.locators.nameInput.fill(name);
   }
 
   async fillEmail(email: string) {
-    await this.emailInput.fill(email);
+    await this.locators.emailInput.fill(email);
   }
 
   async submitNameAndEmail() {
-    await this.goToEstimateButton.click();
+    await this.locators.goToEstimateButton.click();
   }
 
   async fillPhone(phone: string) {
-    await this.phoneInput.click();
-    await this.phoneInput.pressSequentially(phone, { delay: 50 });
+    await this.locators.phoneInput.click();
+    await this.locators.phoneInput.pressSequentially(phone, { delay: 50 });
   }
 
   async submitPhone() {
-    await this.submitButton.scrollIntoViewIfNeeded();
-    await this.submitButton.click();
+    await this.locators.submitButton.scrollIntoViewIfNeeded();
+    await this.locators.submitButton.click();
   }
 
   async fillOutOfAreaEmail(email: string) {
-    await this.outOfAreaEmailInput.fill(email);
+    await this.locators.outOfAreaEmailInput.fill(email);
   }
 
   async submitOutOfAreaEmail() {
-    await this.outOfAreaSubmitButton.click();
+    await this.locators.outOfAreaSubmitButton.click();
   }
 
   async getCurrentStep(): Promise<string> {
-    return await this.stepIndicator.textContent() || '';
+    return await this.locators.stepIndicator.textContent() || '';
   }
 
   async completeFormUntilPhone(data: {
@@ -154,13 +97,10 @@ export class LeadFormPage {
   }) {
     await this.fillZipCode(data.zipCode);
     await this.submitZipCode();
-
     await this.selectInterest(data.interest);
     await this.submitInterest();
-
     await this.selectPropertyType(data.propertyType);
     await this.submitPropertyType();
-
     await this.fillName(data.name);
     await this.fillEmail(data.email);
     await this.submitNameAndEmail();
@@ -177,5 +117,69 @@ export class LeadFormPage {
     await this.completeFormUntilPhone(data);
     await this.fillPhone(data.phone);
     await this.submitPhone();
+  }
+
+  async expectFormContainerVisible() {
+    await expect(this.locators.formContainer).toBeVisible();
+  }
+
+  async expectFormContainerVisibleWithTimeout(timeout: number) {
+    await expect(this.locators.formContainer).toBeVisible({ timeout });
+  }
+
+  async expectZipCodeInputVisible() {
+    await expect(this.locators.zipCodeInput).toBeVisible();
+  }
+
+  async expectZipErrorVisible() {
+    await expect(this.locators.zipErrorMessage).toBeVisible();
+  }
+
+  async expectInterestOptionsVisible() {
+    await expect(this.locators.safetyOption).toBeVisible();
+  }
+
+  async expectInterestOptionsNotVisible() {
+    await expect(this.locators.safetyOption).not.toBeVisible();
+  }
+
+  async expectPropertyOptionsVisible() {
+    await expect(this.locators.ownedHouseOption).toBeVisible();
+  }
+
+  async expectNameInputVisible() {
+    await expect(this.locators.nameInput).toBeVisible();
+  }
+
+  async expectPhoneInputVisible() {
+    await expect(this.locators.phoneInput).toBeVisible();
+  }
+
+  async expectPhoneInputNotVisible() {
+    await expect(this.locators.phoneInput).not.toBeVisible();
+  }
+
+  async expectPhoneErrorVisible() {
+    await expect(this.locators.phoneErrorMessage).toBeVisible();
+  }
+
+  async expectOutOfAreaMessageVisible() {
+    await expect(this.locators.outOfAreaMessage).toBeVisible();
+  }
+
+  async expectOutOfAreaEmailInputVisible() {
+    await expect(this.locators.outOfAreaEmailInput).toBeVisible();
+  }
+
+  async expectOutOfAreaEmailValue(email: string) {
+    await expect(this.locators.outOfAreaEmailInput).toHaveValue(email);
+  }
+
+  async expectNotOnThankYouPage() {
+    await expect(this.page).not.toHaveURL(/.*\/thankyou/);
+  }
+
+  expectStepContains(stepText: string, expected: string) {
+    expect(stepText).toContain(expected);
   }
 }
