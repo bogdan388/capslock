@@ -1,0 +1,19 @@
+{
+  "name": "capslock-qa-tests",
+  "version": "1.0.0",
+  "description": "Playwright automated tests for CapsLock lead form",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:report": "npx playwright show-report"
+  },
+  "keywords": ["playwright", "testing", "automation", "qa"],
+  "author": "Bogdan Iordache",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "typescript": "^5.9.3"
+  }
+}
