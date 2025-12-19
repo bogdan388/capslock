@@ -212,7 +212,7 @@ The project includes a GitHub Actions workflow with the following features:
 - Manual dispatch with custom reason and branch selection
 
 ### Cross-Browser Testing
-Tests run across 5 browser configurations:
+Tests run across 5 browser matrix groups:
 - Chromium (Desktop Chrome)
 - Firefox (Desktop Firefox)
 - WebKit (Desktop Safari)
@@ -227,8 +227,35 @@ Each browser runs on all 3 operating systems:
 
 ### Parallel Execution
 - 5 browsers × 3 OSes × 3 shards = 45 parallel test jobs
+- Each browser matrix shows "9 jobs completed" (3 OSes × 3 shards)
 - 2 workers per shard for optimal runner utilization
 - Blob reporter for merging sharded results
+
+### Workflow Structure
+```
+┌─────────────┐
+│  chromium   │──┐
+│ (9 jobs)    │  │
+├─────────────┤  │
+│  firefox    │  │
+│ (9 jobs)    │  │
+├─────────────┤  │    ┌────────────────┐
+│mobile-chrome│  ├───►│ Merge Reports  │
+│ (9 jobs)    │  │    │                │
+├─────────────┤  │    │ - Merge blobs  │
+│mobile-safari│  │    │ - Deploy Pages │
+│ (9 jobs)    │  │    │ - Output URL   │
+├─────────────┤  │    └────────────────┘
+│   webkit    │──┘
+│ (9 jobs)    │
+└─────────────┘
+```
+
+### Report Access
+After all tests complete, the merged HTML report is automatically deployed to GitHub Pages:
+- **Report URL**: `https://<username>.github.io/<repo>/`
+- URL is displayed in the workflow summary under "Merge Reports summary"
+- Report includes results from all browsers, OSes, and shards in one view
 
 ### Artifacts
 - Individual blob reports per shard (7-day retention)
