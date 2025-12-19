@@ -110,7 +110,6 @@ capslock/
 │   └── production.config.ts
 ├── tests/                  # Test specifications
 │   ├── lead-form.spec.ts   # Main form tests (data-driven)
-│   ├── api-mocking.spec.ts # API edge case tests
 │   ├── navigation.spec.ts  # Browser navigation tests
 │   ├── accessibility.spec.ts
 │   └── performance.spec.ts
@@ -163,28 +162,20 @@ The implemented tests cover the most critical paths of the lead generation form.
 - Tests multi-select functionality on interest options
 - Ensures users understand their progress through the form
 
-#### 8. API Mocking Tests (6 tests) @regression
-- Network failure handling
-- Slow API response handling
-- Server error (500) handling
-- Rate limiting (429) handling
-- Malformed JSON response
-- Timeout scenarios
-
-#### 9. Navigation Tests (7 tests) @regression
+#### 8. Navigation Tests (7 tests) @regression
 - Browser back/forward button handling
 - Page refresh behavior
 - Form data persistence
 - Rapid navigation handling
 
-#### 11. Accessibility Tests (8 tests) @accessibility
+#### 9. Accessibility Tests (8 tests) @accessibility
 - Tab navigation
 - Enter key submission
 - Focus indicators
 - Keyboard-only navigation
 - ARIA labels verification
 
-#### 12. Performance Tests (8 tests) @performance
+#### 10. Performance Tests (8 tests) @performance
 - Page load time
 - Step transition responsiveness
 - Web Vitals metrics collection
