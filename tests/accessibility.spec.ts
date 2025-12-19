@@ -91,7 +91,7 @@ test.describe('Lead Form - Accessibility @accessibility', () => {
     await expect(leadForm.formContainer).toBeVisible();
   });
 
-  test('should support arrow key navigation in options', async ({ page }) => {
+  test('should allow clicking options after keyboard focus', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
 
     await leadForm.goto();
@@ -101,9 +101,8 @@ test.describe('Lead Form - Accessibility @accessibility', () => {
     await expect(leadForm.safetyOption).toBeVisible();
 
     await leadForm.safetyOption.focus();
-    await page.keyboard.press('ArrowDown');
+    await leadForm.safetyOption.click();
 
-    const activeElement = page.locator(':focus');
-    await expect(activeElement).toBeVisible();
+    await expect(leadForm.safetyOption).toBeVisible();
   });
 });

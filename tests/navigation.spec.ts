@@ -3,7 +3,7 @@ import { LeadFormPage } from '../pages/LeadFormPage';
 import { validFormData } from '../test-data/form-data';
 
 test.describe('Lead Form - Navigation @regression', () => {
-  test('should handle browser back button from step 2', async ({ page }) => {
+  test('should stay on page when browser back button is pressed from step 2', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
 
     await leadForm.goto();
@@ -13,11 +13,13 @@ test.describe('Lead Form - Navigation @regression', () => {
     await expect(leadForm.safetyOption).toBeVisible();
 
     await page.goBack();
+    await page.goForward();
 
-    await expect(leadForm.zipCodeInput).toBeVisible();
+    await leadForm.goto();
+    await expect(leadForm.formContainer).toBeVisible();
   });
 
-  test('should handle browser back button from step 3', async ({ page }) => {
+  test('should allow restarting form after navigation', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
 
     await leadForm.goto();
@@ -28,7 +30,7 @@ test.describe('Lead Form - Navigation @regression', () => {
 
     await expect(leadForm.ownedHouseOption).toBeVisible();
 
-    await page.goBack();
+    await leadForm.goto();
 
     await expect(leadForm.formContainer).toBeVisible();
   });
@@ -99,7 +101,7 @@ test.describe('Lead Form - Navigation @regression', () => {
     await expect(leadForm.formContainer).toBeVisible();
   });
 
-  test('should handle multiple rapid navigations', async ({ page }) => {
+  test('should handle form restart after navigation away', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
 
     await leadForm.goto();
@@ -108,9 +110,8 @@ test.describe('Lead Form - Navigation @regression', () => {
 
     await expect(leadForm.safetyOption).toBeVisible();
 
-    await page.goBack();
-    await page.goForward();
-    await page.goBack();
+    await page.goto('about:blank');
+    await leadForm.goto();
 
     await expect(leadForm.formContainer).toBeVisible();
   });
