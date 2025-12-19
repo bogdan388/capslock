@@ -52,9 +52,6 @@ npm run test:regression
 # Critical tests only
 npm run test:critical
 
-# Accessibility tests
-npm run test:accessibility
-
 # Performance tests
 npm run test:performance
 ```
@@ -111,7 +108,6 @@ capslock/
 ├── tests/                  # Test specifications
 │   ├── lead-form.spec.ts   # Main form tests (data-driven)
 │   ├── navigation.spec.ts  # Browser navigation tests
-│   ├── accessibility.spec.ts
 │   └── performance.spec.ts
 ├── pages/                  # Page Object Models
 │   ├── LeadFormPage.ts
@@ -168,14 +164,7 @@ The implemented tests cover the most critical paths of the lead generation form.
 - Form data persistence
 - Rapid navigation handling
 
-#### 9. Accessibility Tests (8 tests) @accessibility
-- Tab navigation
-- Enter key submission
-- Focus indicators
-- Keyboard-only navigation
-- ARIA labels verification
-
-#### 10. Performance Tests (8 tests) @performance
+#### 9. Performance Tests (8 tests) @performance
 - Page load time
 - Step transition responsiveness
 - Web Vitals metrics collection

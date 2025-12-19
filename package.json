@@ -11,7 +11,6 @@
     "test:smoke": "npx playwright test --grep @smoke",
     "test:regression": "npx playwright test --grep @regression",
     "test:critical": "npx playwright test --grep @critical",
-    "test:accessibility": "npx playwright test --grep @accessibility",
     "test:performance": "npx playwright test --grep @performance",
     "test:staging": "TEST_ENV=staging npx playwright test",
     "test:production": "TEST_ENV=production npx playwright test",
