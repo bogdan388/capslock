@@ -6,6 +6,7 @@ Automated end-to-end tests for the CapsLock Walk-In Bath lead form using Playwri
 
 - Node.js 18 or higher
 - npm
+- Allure CLI (optional, for Allure reports)
 
 ## Installation
 
@@ -37,19 +38,101 @@ npm run test:debug
 npm run test:report
 ```
 
+## Test Tags
+
+Run tests by category using grep patterns:
+
+```bash
+# Smoke tests (critical path)
+npm run test:smoke
+
+# Regression tests (full validation)
+npm run test:regression
+
+# Critical tests only
+npm run test:critical
+
+# Visual regression tests
+npm run test:visual
+
+# Accessibility tests
+npm run test:accessibility
+
+# Performance tests
+npm run test:performance
+```
+
+## Environment Configuration
+
+Run tests against different environments:
+
+```bash
+# Staging (default)
+npm run test:staging
+
+# Production
+npm run test:production
+
+# Development (localhost)
+npm run test:dev
+
+# Or set environment variable directly
+TEST_ENV=staging npx playwright test
+```
+
+Available environments:
+- `development` - http://localhost:3000
+- `staging` - https://test-qa.capslock.global
+- `production` - https://capslock.global
+
+## Allure Reports
+
+Generate and view Allure reports:
+
+```bash
+# Run tests first (generates allure-results)
+npm test
+
+# Generate Allure report
+npm run allure:generate
+
+# Open Allure report in browser
+npm run allure:open
+```
+
+## Visual Regression Testing
+
+Update baseline screenshots:
+
+```bash
+npm run test:update-snapshots
+```
+
+Visual tests compare current UI against baseline screenshots stored in the repository.
+
 ## Project Structure
 
 ```
 capslock/
 ├── .github/workflows/      # CI/CD configuration
 │   └── playwright.yml      # GitHub Actions workflow
+├── environments/           # Environment configurations
+│   ├── index.ts           # Environment loader
+│   ├── development.config.ts
+│   ├── staging.config.ts
+│   └── production.config.ts
 ├── tests/                  # Test specifications
-│   └── lead-form.spec.ts   # Main test file (14 tests)
+│   ├── lead-form.spec.ts   # Main form tests (data-driven)
+│   ├── api-mocking.spec.ts # API edge case tests
+│   ├── visual-regression.spec.ts
+│   ├── navigation.spec.ts  # Browser navigation tests
+│   ├── accessibility.spec.ts
+│   └── performance.spec.ts
 ├── pages/                  # Page Object Models
-│   ├── LeadFormPage.ts     # Lead form page object
-│   └── ThankYouPage.ts     # Thank you page object
+│   ├── LeadFormPage.ts
+│   └── ThankYouPage.ts
 ├── test-data/              # Test data constants
-│   └── form-data.ts        # Form validation data
+│   └── form-data.ts
 ├── playwright.config.ts    # Playwright configuration
 └── package.json
 ```
@@ -60,39 +143,72 @@ capslock/
 
 ### Why These Scenarios Were Selected
 
-The 14 implemented tests cover the most critical paths of the lead generation form. Here's the rationale for each category:
+The implemented tests cover the most critical paths of the lead generation form. Here's the rationale for each category:
 
-#### 1. Happy Path (1 test)
+#### 1. Happy Path (1 test) @smoke @critical
 - **Complete form submission with valid data**: This is the most critical scenario as it represents the primary business flow. A user successfully submitting their information is the main conversion goal.
 
-#### 2. ZIP Code Validation (4 tests)
+#### 2. ZIP Code Validation (4 tests) @regression
 - ZIP code is the first user interaction and determines the entire form flow
 - Invalid ZIP codes (too short, too long, with letters, empty) must be caught to prevent bad data
 - ZIP codes also route users to different flows (in-area vs out-of-area)
 
-#### 3. Email Validation (2 tests)
+#### 3. Email Validation (4 tests) @regression
 - Email is essential for lead follow-up and marketing
 - Invalid emails result in lost business opportunities
-- Required field validation prevents empty submissions
+- Tests cover: no @ sign, no domain, no username, empty
 
-#### 4. Phone Validation (2 tests)
+#### 4. Phone Validation (3 tests) @regression
 - Phone is the primary contact method for sales follow-up
 - Invalid phone numbers make leads unreachable
-- Required field validation prevents empty submissions
+- Tests cover: too short, with letters, empty
 
-#### 5. Out of Area Flow (2 tests)
+#### 5. Out of Area Flow (2 tests) @smoke
 - Tests the alternative user journey for non-serviceable areas
 - Ensures potential customers can still sign up for notifications
 - Important for capturing leads in expansion areas
 
-#### 6. Required Fields (1 test)
+#### 6. Required Fields (1 test) @regression
 - Name is required for personalized follow-up
 - Verifies that the form enforces mandatory fields
 
-#### 7. Multi-step Navigation (2 tests)
+#### 7. Multi-step Navigation (2 tests) @regression
 - Verifies the form progression indicator works correctly
 - Tests multi-select functionality on interest options
 - Ensures users understand their progress through the form
+
+#### 8. API Mocking Tests (6 tests) @regression
+- Network failure handling
+- Slow API response handling
+- Server error (500) handling
+- Rate limiting (429) handling
+- Malformed JSON response
+- Timeout scenarios
+
+#### 9. Visual Regression Tests (7 tests) @visual
+- Baseline screenshots for each form step
+- Validation error states
+- Out of area message display
+
+#### 10. Navigation Tests (7 tests) @regression
+- Browser back/forward button handling
+- Page refresh behavior
+- Form data persistence
+- Rapid navigation handling
+
+#### 11. Accessibility Tests (8 tests) @accessibility
+- Tab navigation
+- Enter key submission
+- Focus indicators
+- Keyboard-only navigation
+- ARIA labels verification
+
+#### 12. Performance Tests (8 tests) @performance
+- Page load time
+- Step transition responsiveness
+- Web Vitals metrics collection
+- Memory leak detection
+- Network request monitoring
 
 ---
 
@@ -114,34 +230,6 @@ The 14 implemented tests cover the most critical paths of the lead generation fo
 **Workaround**: Use `pressSequentially()` instead of `fill()` to type characters one by one, which works correctly with the input mask.
 
 **Severity**: Medium - Affects automated testing, may also affect users with autofill or paste functionality.
-
----
-
-## Potential Improvements
-
-### Scalability and Maintainability
-
-1. **Environment Configuration**: Add support for multiple environments (dev, staging, prod) using `.env` files or Playwright's project configuration.
-
-2. **Data-Driven Testing**: Implement data-driven tests using Playwright's `test.describe.each()` for testing multiple invalid input combinations without code duplication.
-
-3. **Custom Reporter**: Add Allure or another custom reporter for better CI/CD integration and test result visualization.
-
-4. **API Mocking**: Implement request interception to test edge cases like network failures, slow responses, or specific API error conditions.
-
-5. **Visual Regression Testing**: Add screenshot comparison tests for critical UI states to catch unintended visual changes.
-
-6. **Retry Logic**: Configure smart retry strategies for flaky network-dependent tests.
-
-7. **Test Tags**: Add tags/annotations (`@smoke`, `@regression`, `@critical`) to enable selective test execution.
-
-### Additional Tests to Consider
-
-- Form data persistence (if user navigates back)
-- Browser back button behavior
-- Keyboard navigation/accessibility
-- Form submission rate limiting
-- Performance metrics (page load time, interaction delays)
 
 ---
 

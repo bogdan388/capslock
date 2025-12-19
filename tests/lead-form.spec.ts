@@ -9,7 +9,7 @@ import {
   outOfAreaZipCode,
 } from '../test-data/form-data';
 
-test.describe('Lead Form - Happy Path', () => {
+test.describe('Lead Form - Happy Path @smoke @critical', () => {
   test('should successfully submit the form with valid data and redirect to thank you page', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
     const thankYouPage = new ThankYouPage(page);
@@ -41,65 +41,53 @@ test.describe('Lead Form - Happy Path', () => {
   });
 });
 
-test.describe('Lead Form - ZIP Code Validation', () => {
-  test('should not proceed with ZIP code less than 5 digits', async ({ page }) => {
-    const leadForm = new LeadFormPage(page);
+const zipCodeTestCases = [
+  { name: 'too short', value: invalidZipCodes.tooShort, description: 'less than 5 digits' },
+  { name: 'too long', value: invalidZipCodes.tooLong, description: 'more than 5 digits' },
+  { name: 'with letters', value: invalidZipCodes.withLetters, description: 'containing letters' },
+  { name: 'empty', value: '', description: 'empty value' },
+];
 
-    await leadForm.goto();
-    await leadForm.fillZipCode(invalidZipCodes.tooShort);
-    await leadForm.submitZipCode();
+test.describe('Lead Form - ZIP Code Validation @regression', () => {
+  for (const testCase of zipCodeTestCases) {
+    test(`should not proceed with ZIP code ${testCase.description}`, async ({ page }) => {
+      const leadForm = new LeadFormPage(page);
 
-    await expect(leadForm.zipCodeInput).toBeVisible();
-    await expect(leadForm.safetyOption).not.toBeVisible();
-  });
+      await leadForm.goto();
+      if (testCase.value) {
+        await leadForm.fillZipCode(testCase.value);
+      }
+      await leadForm.submitZipCode();
 
-  test('should not proceed with ZIP code more than 5 digits', async ({ page }) => {
-    const leadForm = new LeadFormPage(page);
-
-    await leadForm.goto();
-    await leadForm.fillZipCode(invalidZipCodes.tooLong);
-    await leadForm.submitZipCode();
-
-    await expect(leadForm.zipCodeInput).toBeVisible();
-  });
-
-  test('should not accept ZIP code with letters', async ({ page }) => {
-    const leadForm = new LeadFormPage(page);
-
-    await leadForm.goto();
-    await leadForm.fillZipCode(invalidZipCodes.withLetters);
-    await leadForm.submitZipCode();
-
-    await expect(leadForm.zipCodeInput).toBeVisible();
-    await expect(leadForm.safetyOption).not.toBeVisible();
-  });
-
-  test('should not proceed with empty ZIP code', async ({ page }) => {
-    const leadForm = new LeadFormPage(page);
-
-    await leadForm.goto();
-    await leadForm.submitZipCode();
-
-    await expect(leadForm.zipCodeInput).toBeVisible();
-    await expect(leadForm.safetyOption).not.toBeVisible();
-  });
+      await expect(leadForm.zipCodeInput).toBeVisible();
+      await expect(leadForm.safetyOption).not.toBeVisible();
+    });
+  }
 });
 
-test.describe('Lead Form - Email Validation', () => {
-  test('should not proceed with invalid email format (no @ sign)', async ({ page }) => {
-    const leadForm = new LeadFormPage(page);
+const emailTestCases = [
+  { name: 'no @ sign', value: invalidEmails.noAtSign },
+  { name: 'no domain', value: invalidEmails.noDomain },
+  { name: 'no username', value: invalidEmails.noUsername },
+];
 
-    await leadForm.goto();
-    await leadForm.completeFormUntilPhone({
-      zipCode: validFormData.zipCode,
-      interest: 'Safety',
-      propertyType: 'Owned House / Condo',
-      name: validFormData.name,
-      email: invalidEmails.noAtSign,
+test.describe('Lead Form - Email Validation @regression', () => {
+  for (const testCase of emailTestCases) {
+    test(`should not proceed with invalid email (${testCase.name})`, async ({ page }) => {
+      const leadForm = new LeadFormPage(page);
+
+      await leadForm.goto();
+      await leadForm.completeFormUntilPhone({
+        zipCode: validFormData.zipCode,
+        interest: 'Safety',
+        propertyType: 'Owned House / Condo',
+        name: validFormData.name,
+        email: testCase.value,
+      });
+
+      await expect(leadForm.phoneInput).not.toBeVisible();
     });
-
-    await expect(leadForm.phoneInput).not.toBeVisible();
-  });
+  }
 
   test('should not proceed with empty email', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
@@ -120,25 +108,32 @@ test.describe('Lead Form - Email Validation', () => {
   });
 });
 
-test.describe('Lead Form - Phone Validation', () => {
-  test('should not submit with phone number less than 10 digits', async ({ page }) => {
-    const leadForm = new LeadFormPage(page);
+const phoneTestCases = [
+  { name: 'too short', value: invalidPhones.tooShort },
+  { name: 'with letters', value: invalidPhones.withLetters },
+];
 
-    await leadForm.goto();
-    await leadForm.completeFormUntilPhone({
-      zipCode: validFormData.zipCode,
-      interest: 'Safety',
-      propertyType: 'Owned House / Condo',
-      name: validFormData.name,
-      email: validFormData.email,
+test.describe('Lead Form - Phone Validation @regression', () => {
+  for (const testCase of phoneTestCases) {
+    test(`should not submit with phone number ${testCase.name}`, async ({ page }) => {
+      const leadForm = new LeadFormPage(page);
+
+      await leadForm.goto();
+      await leadForm.completeFormUntilPhone({
+        zipCode: validFormData.zipCode,
+        interest: 'Safety',
+        propertyType: 'Owned House / Condo',
+        name: validFormData.name,
+        email: validFormData.email,
+      });
+
+      await leadForm.fillPhone(testCase.value);
+      await leadForm.submitPhone();
+
+      await expect(leadForm.phoneErrorMessage).toBeVisible();
+      await expect(page).not.toHaveURL(/.*\/thankyou/);
     });
-
-    await leadForm.fillPhone(invalidPhones.tooShort);
-    await leadForm.submitPhone();
-
-    await expect(leadForm.phoneErrorMessage).toBeVisible();
-    await expect(page).not.toHaveURL(/.*\/thankyou/);
-  });
+  }
 
   test('should not submit with empty phone number', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
@@ -158,7 +153,7 @@ test.describe('Lead Form - Phone Validation', () => {
   });
 });
 
-test.describe('Lead Form - Out of Area Flow', () => {
+test.describe('Lead Form - Out of Area Flow @smoke', () => {
   test('should show out of area message for non-Michigan ZIP codes', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
 
@@ -184,7 +179,7 @@ test.describe('Lead Form - Out of Area Flow', () => {
   });
 });
 
-test.describe('Lead Form - Required Fields', () => {
+test.describe('Lead Form - Required Fields @regression', () => {
   test('should not proceed from step 4 without name', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
 
@@ -204,7 +199,7 @@ test.describe('Lead Form - Required Fields', () => {
   });
 });
 
-test.describe('Lead Form - Multi-step Navigation', () => {
+test.describe('Lead Form - Multi-step Navigation @regression', () => {
   test('should display correct step indicator during form progression', async ({ page }) => {
     const leadForm = new LeadFormPage(page);
 

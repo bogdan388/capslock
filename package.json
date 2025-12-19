@@ -7,13 +7,32 @@
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
     "test:debug": "npx playwright test --debug",
-    "test:report": "npx playwright show-report"
+    "test:report": "npx playwright show-report",
+    "test:smoke": "npx playwright test --grep @smoke",
+    "test:regression": "npx playwright test --grep @regression",
+    "test:critical": "npx playwright test --grep @critical",
+    "test:visual": "npx playwright test --grep @visual",
+    "test:accessibility": "npx playwright test --grep @accessibility",
+    "test:performance": "npx playwright test --grep @performance",
+    "test:staging": "TEST_ENV=staging npx playwright test",
+    "test:production": "TEST_ENV=production npx playwright test",
+    "test:dev": "TEST_ENV=development npx playwright test",
+    "allure:generate": "allure generate allure-results -o allure-report --clean",
+    "allure:open": "allure open allure-report",
+    "test:update-snapshots": "npx playwright test --grep @visual --update-snapshots"
   },
-  "keywords": ["playwright", "testing", "automation", "qa"],
+  "keywords": [
+    "playwright",
+    "testing",
+    "automation",
+    "qa"
+  ],
   "author": "Bogdan Iordache",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.3",
+    "allure-playwright": "^3.4.3",
     "typescript": "^5.9.3"
   }
 }

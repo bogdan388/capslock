@@ -1,18 +1,35 @@
 import { defineConfig, devices } from '@playwright/test';
+import { getEnvironmentConfig } from './environments';
+
+const envConfig = getEnvironmentConfig(process.env.TEST_ENV);
 
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 2 : undefined,
-  reporter: 'html',
+  reporter: [
+    ['html'],
+    ['list'],
+    ['json', { outputFile: 'test-results/results.json' }],
+    ['allure-playwright'],
+  ],
   use: {
-    baseURL: 'https://test-qa.capslock.global',
+    baseURL: envConfig.baseURL,
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    actionTimeout: 15000,
+    navigationTimeout: 30000,
+  },
+  expect: {
+    timeout: 10000,
+    toHaveScreenshot: {
+      maxDiffPixels: 100,
+      threshold: 0.2,
+    },
   },
   projects: [
     {
