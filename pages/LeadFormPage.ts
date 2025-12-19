@@ -73,6 +73,7 @@ export class LeadFormPage {
 
   async goto() {
     await this.page.goto('/');
+    await this.formContainer.scrollIntoViewIfNeeded();
   }
 
   async fillZipCode(zipCode: string) {
@@ -123,10 +124,12 @@ export class LeadFormPage {
   }
 
   async fillPhone(phone: string) {
-    await this.phoneInput.pressSequentially(phone);
+    await this.phoneInput.click();
+    await this.phoneInput.pressSequentially(phone, { delay: 50 });
   }
 
   async submitPhone() {
+    await this.submitButton.scrollIntoViewIfNeeded();
     await this.submitButton.click();
   }
 
