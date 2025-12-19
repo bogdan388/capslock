@@ -11,14 +11,21 @@ Automated end-to-end tests for the CapsLock Walk-In Bath lead form using Playwri
 
 ```bash
 npm install
-npx playwright install chromium
+npx playwright install --with-deps
 ```
 
 ## Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (all browsers)
 npm test
+
+# Run specific browser
+npx playwright test --project=chromium
+npx playwright test --project=firefox
+npx playwright test --project=webkit
+npx playwright test --project=mobile-chrome
+npx playwright test --project=mobile-safari
 
 # Run tests with browser visible
 npm run test:headed
@@ -34,8 +41,10 @@ npm run test:report
 
 ```
 capslock/
+├── .github/workflows/      # CI/CD configuration
+│   └── playwright.yml      # GitHub Actions workflow
 ├── tests/                  # Test specifications
-│   └── lead-form.spec.ts   # Main test file
+│   └── lead-form.spec.ts   # Main test file (14 tests)
 ├── pages/                  # Page Object Models
 │   ├── LeadFormPage.ts     # Lead form page object
 │   └── ThankYouPage.ts     # Thank you page object
@@ -130,41 +139,43 @@ The 14 implemented tests cover the most critical paths of the lead generation fo
 
 - Form data persistence (if user navigates back)
 - Browser back button behavior
-- Mobile viewport testing
 - Keyboard navigation/accessibility
 - Form submission rate limiting
-- Cross-browser testing (Firefox, WebKit)
 - Performance metrics (page load time, interaction delays)
 
 ---
 
-## CI Configuration (Example)
+## CI/CD Pipeline
 
-```yaml
-# .github/workflows/playwright.yml
-name: Playwright Tests
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm test
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: playwright-report
-          path: playwright-report/
-```
+The project includes a GitHub Actions workflow with the following features:
+
+### Triggers
+- Push to `main` or `master` branches
+- Pull requests to `main` or `master` branches
+- Manual dispatch with custom reason and branch selection
+
+### Cross-Browser Testing
+Tests run across 5 browser configurations:
+- Chromium (Desktop Chrome)
+- Firefox (Desktop Firefox)
+- WebKit (Desktop Safari)
+- Mobile Chrome (Pixel 5)
+- Mobile Safari (iPhone 12)
+
+### Parallel Execution
+- 3 shards per browser for 15 parallel test jobs
+- 2 workers per shard for optimal runner utilization
+- Blob reporter for merging sharded results
+
+### Artifacts
+- Individual blob reports per shard (7-day retention)
+- Merged HTML report after all tests complete (30-day retention)
+- Traces, screenshots, and videos captured on failure
+
+### Manual Trigger
+Run tests manually via GitHub Actions UI with:
+- **Reason**: Description of why tests are being run
+- **Branch**: Target branch to test against
 
 ---
 
