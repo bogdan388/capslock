@@ -162,8 +162,14 @@ Tests run across 5 browser configurations:
 - Mobile Chrome (Pixel 5)
 - Mobile Safari (iPhone 12)
 
+### Cross-OS Testing
+Each browser runs on all 3 operating systems:
+- Ubuntu (Linux)
+- Windows
+- macOS
+
 ### Parallel Execution
-- 3 shards per browser for 15 parallel test jobs
+- 5 browsers × 3 OSes × 3 shards = 45 parallel test jobs
 - 2 workers per shard for optimal runner utilization
 - Blob reporter for merging sharded results
 

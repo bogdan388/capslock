@@ -19,12 +19,13 @@ on:
 
 jobs:
   chromium:
-    name: Chromium (${{ matrix.shard }}/${{ strategy.job-total }})
+    name: Chromium (${{ matrix.os }} ${{ matrix.shard }}/3)
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
@@ -46,17 +47,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-chromium-${{ matrix.shard }}
+          name: blob-report-chromium-${{ matrix.os }}-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   firefox:
-    name: Firefox (${{ matrix.shard }}/${{ strategy.job-total }})
+    name: Firefox (${{ matrix.os }} ${{ matrix.shard }}/3)
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
@@ -78,17 +80,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-firefox-${{ matrix.shard }}
+          name: blob-report-firefox-${{ matrix.os }}-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   webkit:
-    name: WebKit (${{ matrix.shard }}/${{ strategy.job-total }})
+    name: WebKit (${{ matrix.os }} ${{ matrix.shard }}/3)
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
@@ -110,17 +113,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-webkit-${{ matrix.shard }}
+          name: blob-report-webkit-${{ matrix.os }}-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   mobile-chrome:
-    name: Mobile Chrome (${{ matrix.shard }}/${{ strategy.job-total }})
+    name: Mobile Chrome (${{ matrix.os }} ${{ matrix.shard }}/3)
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
@@ -142,17 +146,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-mobile-chrome-${{ matrix.shard }}
+          name: blob-report-mobile-chrome-${{ matrix.os }}-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   mobile-safari:
-    name: Mobile Safari (${{ matrix.shard }}/${{ strategy.job-total }})
+    name: Mobile Safari (${{ matrix.os }} ${{ matrix.shard }}/3)
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
@@ -174,7 +179,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-mobile-safari-${{ matrix.shard }}
+          name: blob-report-mobile-safari-${{ matrix.os }}-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
