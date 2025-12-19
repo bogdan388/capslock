@@ -9,9 +9,10 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: 'https://test-qa.capslock.global',
-    trace: 'on-first-retry',
     ignoreHTTPSErrors: true,
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
   projects: [
     {
