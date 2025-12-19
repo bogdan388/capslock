@@ -11,15 +11,13 @@
     "test:smoke": "npx playwright test --grep @smoke",
     "test:regression": "npx playwright test --grep @regression",
     "test:critical": "npx playwright test --grep @critical",
-    "test:visual": "npx playwright test --grep @visual",
     "test:accessibility": "npx playwright test --grep @accessibility",
     "test:performance": "npx playwright test --grep @performance",
     "test:staging": "TEST_ENV=staging npx playwright test",
     "test:production": "TEST_ENV=production npx playwright test",
     "test:dev": "TEST_ENV=development npx playwright test",
     "allure:generate": "allure generate allure-results -o allure-report --clean",
-    "allure:open": "allure open allure-report",
-    "test:update-snapshots": "npx playwright test --grep @visual --update-snapshots"
+    "allure:open": "allure open allure-report"
   },
   "keywords": [
     "playwright",

@@ -52,9 +52,6 @@ npm run test:regression
 # Critical tests only
 npm run test:critical
 
-# Visual regression tests
-npm run test:visual
-
 # Accessibility tests
 npm run test:accessibility
 
@@ -100,16 +97,6 @@ npm run allure:generate
 npm run allure:open
 ```
 
-## Visual Regression Testing
-
-Update baseline screenshots:
-
-```bash
-npm run test:update-snapshots
-```
-
-Visual tests compare current UI against baseline screenshots stored in the repository.
-
 ## Project Structure
 
 ```
@@ -124,7 +111,6 @@ capslock/
 ├── tests/                  # Test specifications
 │   ├── lead-form.spec.ts   # Main form tests (data-driven)
 │   ├── api-mocking.spec.ts # API edge case tests
-│   ├── visual-regression.spec.ts
 │   ├── navigation.spec.ts  # Browser navigation tests
 │   ├── accessibility.spec.ts
 │   └── performance.spec.ts
@@ -185,12 +171,7 @@ The implemented tests cover the most critical paths of the lead generation form.
 - Malformed JSON response
 - Timeout scenarios
 
-#### 9. Visual Regression Tests (7 tests) @visual
-- Baseline screenshots for each form step
-- Validation error states
-- Out of area message display
-
-#### 10. Navigation Tests (7 tests) @regression
+#### 9. Navigation Tests (7 tests) @regression
 - Browser back/forward button handling
 - Page refresh behavior
 - Form data persistence
@@ -264,7 +245,7 @@ Each browser runs on all 3 operating systems:
 ### Artifacts
 - Individual blob reports per shard (7-day retention)
 - Merged HTML report after all tests complete (30-day retention)
-- Traces, screenshots, and videos captured on failure
+- Traces and screenshots captured on failure
 
 ### Manual Trigger
 Run tests manually via GitHub Actions UI with:

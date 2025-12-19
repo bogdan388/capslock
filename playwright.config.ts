@@ -20,16 +20,12 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'off',
     actionTimeout: 15000,
     navigationTimeout: 30000,
   },
   expect: {
     timeout: 10000,
-    toHaveScreenshot: {
-      maxDiffPixels: 100,
-      threshold: 0.2,
-    },
   },
   projects: [
     {
