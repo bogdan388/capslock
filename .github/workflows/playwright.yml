@@ -19,9 +19,13 @@ on:
 
 jobs:
   chromium:
-    name: Chromium
+    name: Chromium (${{ matrix.shard }}/${{ strategy.job-total }})
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,20 +40,24 @@ jobs:
       - run: npx playwright install chromium --with-deps
 
       - name: Run Chromium tests
-        run: npx playwright test --project=chromium --reporter=blob
+        run: npx playwright test --project=chromium --shard=${{ matrix.shard }}/2 --reporter=blob
 
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-chromium
+          name: blob-report-chromium-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   firefox:
-    name: Firefox
+    name: Firefox (${{ matrix.shard }}/${{ strategy.job-total }})
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,20 +72,24 @@ jobs:
       - run: npx playwright install firefox --with-deps
 
       - name: Run Firefox tests
-        run: npx playwright test --project=firefox --reporter=blob
+        run: npx playwright test --project=firefox --shard=${{ matrix.shard }}/2 --reporter=blob
 
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-firefox
+          name: blob-report-firefox-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   webkit:
-    name: WebKit (Safari)
+    name: WebKit (${{ matrix.shard }}/${{ strategy.job-total }})
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,20 +104,24 @@ jobs:
       - run: npx playwright install webkit --with-deps
 
       - name: Run WebKit tests
-        run: npx playwright test --project=webkit --reporter=blob
+        run: npx playwright test --project=webkit --shard=${{ matrix.shard }}/2 --reporter=blob
 
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-webkit
+          name: blob-report-webkit-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   mobile-chrome:
-    name: Mobile Chrome
+    name: Mobile Chrome (${{ matrix.shard }}/${{ strategy.job-total }})
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -120,20 +136,24 @@ jobs:
       - run: npx playwright install chromium --with-deps
 
       - name: Run Mobile Chrome tests
-        run: npx playwright test --project=mobile-chrome --reporter=blob
+        run: npx playwright test --project=mobile-chrome --shard=${{ matrix.shard }}/2 --reporter=blob
 
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-mobile-chrome
+          name: blob-report-mobile-chrome-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
   mobile-safari:
-    name: Mobile Safari
+    name: Mobile Safari (${{ matrix.shard }}/${{ strategy.job-total }})
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -148,13 +168,13 @@ jobs:
       - run: npx playwright install webkit --with-deps
 
       - name: Run Mobile Safari tests
-        run: npx playwright test --project=mobile-safari --reporter=blob
+        run: npx playwright test --project=mobile-safari --shard=${{ matrix.shard }}/2 --reporter=blob
 
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-mobile-safari
+          name: blob-report-mobile-safari-${{ matrix.shard }}
           path: blob-report/
           retention-days: 7
 
