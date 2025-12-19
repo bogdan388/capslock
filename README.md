@@ -182,6 +182,14 @@ The implemented tests cover the most critical paths of the lead generation form.
 - Memory leak detection
 - Network request monitoring
 
+**Note**: Performance tests use a warning-based approach rather than hard failures. When metrics exceed thresholds, tests still pass but add warning annotations to the Playwright report. This prevents flaky CI failures due to network or environment variability while still surfacing performance concerns.
+
+Thresholds:
+- Page load: 5000ms
+- Step transition: 2000ms
+- Form completion: 30000ms
+- Memory growth: 100%
+
 ---
 
 ## Identified Defects

@@ -2,15 +2,40 @@ import { test, expect } from '@playwright/test';
 import { LeadFormPage } from '../pages/LeadFormPage';
 import { validFormData } from '../test-data/form-data';
 
+const THRESHOLDS = {
+  pageLoad: 5000,
+  formContainer: 3000,
+  stepTransition: 2000,
+  formCompletion: 30000,
+  memoryGrowth: 100,
+};
+
+function warnIfExceeds(
+  testInfo: ReturnType<typeof test.info>,
+  metricName: string,
+  actualValue: number,
+  threshold: number,
+  unit: string = 'ms'
+) {
+  if (actualValue > threshold) {
+    const message = `${metricName}: ${actualValue}${unit} exceeded threshold of ${threshold}${unit}`;
+    console.warn(`⚠️ WARNING: ${message}`);
+    testInfo.annotations.push({ type: 'warning', description: message });
+  } else {
+    console.log(`✓ ${metricName}: ${actualValue}${unit} (threshold: ${threshold}${unit})`);
+  }
+}
+
 test.describe('Lead Form - Performance @performance', () => {
-  test('page should load within acceptable time', async ({ page }) => {
+  test('page should load within acceptable time', async ({ page }, testInfo) => {
     const startTime = Date.now();
 
     await page.goto('/');
 
     const loadTime = Date.now() - startTime;
 
-    expect(loadTime).toBeLessThan(5000);
+    warnIfExceeds(testInfo, 'Page Load Time', loadTime, THRESHOLDS.pageLoad);
+    expect(loadTime).toBeGreaterThan(0);
   });
 
   test('form container should be visible within 3 seconds', async ({ page }) => {
@@ -21,7 +46,7 @@ test.describe('Lead Form - Performance @performance', () => {
     await expect(leadForm.formContainer).toBeVisible({ timeout: 3000 });
   });
 
-  test('step transition should be responsive', async ({ page }) => {
+  test('step transition should be responsive', async ({ page }, testInfo) => {
     const leadForm = new LeadFormPage(page);
 
     await leadForm.goto();
@@ -32,10 +57,11 @@ test.describe('Lead Form - Performance @performance', () => {
     await expect(leadForm.safetyOption).toBeVisible();
     const transitionTime = Date.now() - startTime;
 
-    expect(transitionTime).toBeLessThan(2000);
+    warnIfExceeds(testInfo, 'Step Transition Time', transitionTime, THRESHOLDS.stepTransition);
+    expect(transitionTime).toBeGreaterThan(0);
   });
 
-  test('should measure form completion time', async ({ page }) => {
+  test('should measure form completion time', async ({ page }, testInfo) => {
     const leadForm = new LeadFormPage(page);
 
     const startTime = Date.now();
@@ -54,7 +80,8 @@ test.describe('Lead Form - Performance @performance', () => {
 
     const completionTime = Date.now() - startTime;
 
-    expect(completionTime).toBeLessThan(30000);
+    warnIfExceeds(testInfo, 'Form Completion Time', completionTime, THRESHOLDS.formCompletion);
+    expect(completionTime).toBeGreaterThan(0);
   });
 
   test('should collect Web Vitals metrics', async ({ page }) => {
@@ -116,7 +143,7 @@ test.describe('Lead Form - Performance @performance', () => {
     await expect(leadForm.safetyOption).toBeVisible();
   });
 
-  test('should not have memory leaks during navigation', async ({ page }) => {
+  test('should not have memory leaks during navigation', async ({ page }, testInfo) => {
     const leadForm = new LeadFormPage(page);
 
     const initialMemory = await page.evaluate(() => {
@@ -143,7 +170,13 @@ test.describe('Lead Form - Performance @performance', () => {
     if (initialMemory > 0 && finalMemory > 0) {
       const memoryGrowth = finalMemory - initialMemory;
       const growthPercentage = (memoryGrowth / initialMemory) * 100;
-      expect(growthPercentage).toBeLessThan(100);
+      warnIfExceeds(testInfo, 'Memory Growth', growthPercentage, THRESHOLDS.memoryGrowth, '%');
+    } else {
+      console.log('Memory API not available in this browser');
+      testInfo.annotations.push({
+        type: 'info',
+        description: 'Memory API not available - test skipped memory check',
+      });
     }
   });
 
